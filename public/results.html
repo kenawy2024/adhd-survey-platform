@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>نتيجة الاختبار | منصة ADHD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/survey.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container">
+    <a href="/" class="navbar-brand"><div class="logo-icon">🧠</div><span>منصة ADHD</span></a>
+    <div class="navbar-nav">
+      <a href="/">الرئيسية</a>
+      <a href="/surveys.html">الاستبيانات</a>
+      <a href="/about.html">عن ADHD</a>
+    </div>
+    <div class="navbar-actions">
+      <a href="/surveys.html" class="btn btn-secondary btn-sm">← جميع الاختبارات</a>
+    </div>
+  </div>
+</nav>
+
+<!-- No result state -->
+<div id="noResultState" class="hidden" style="text-align:center;padding:5rem 2rem;">
+  <div style="font-size:3rem;margin-bottom:1rem;">❌</div>
+  <h2>لا توجد نتيجة</h2>
+  <p style="margin:1rem 0;color:#64748b;">لم يتم العثور على نتيجة اختبار. يرجى إكمال الاختبار أولاً.</p>
+  <a href="/surveys.html" class="btn btn-primary">ابدأ اختباراً الآن</a>
+</div>
+
+<!-- Results Content -->
+<div id="resultsContent" class="hidden">
+
+  <!-- Ad Top -->
+  <div class="container" style="margin-top:1rem;">
+    <div class="ad-zone banner" id="ad-results-top">
+      <div class="ad-label">إعلان</div><span>مساحة إعلانية</span>
+    </div>
+  </div>
+
+  <div class="container results-page">
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:2rem;align-items:start;">
+
+      <!-- Main Results -->
+      <div>
+        <!-- Result Header Card -->
+        <div class="result-card">
+          <div class="result-header" id="resultHeader" style="background:linear-gradient(135deg,#4f46e5,#3730a3);">
+            <span class="result-icon" id="resultIcon">🧠</span>
+            <p id="resultSurveyTitle" style="color:rgba(255,255,255,.8);margin-bottom:.5rem;font-size:.95rem;"></p>
+            <h2 id="resultLabel">جاري الحساب...</h2>
+            <span class="result-score" id="resultScore">--</span>
+            <span class="result-max" id="resultMax">من -- نقطة</span>
+          </div>
+          <div class="result-body">
+            <span class="result-label-badge" id="resultBadge" style="background:rgba(79,70,229,.1);color:#4f46e5;">
+              ⏳ جاري التحميل...
+            </span>
+            <p class="result-description" id="resultDescription"></p>
+            <div class="medical-disclaimer">
+              <span class="disclaimer-icon">⚕️</span>
+              <div>
+                <strong>تنبيه طبي هام:</strong> هذه النتيجة ليست تشخيصاً طبياً ويُنصح باستشارة مختص. هذا الاختبار أداة للفحص الذاتي فقط ولا يُغني عن رأي الطبيب أو المعالج النفسي المتخصص.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section">
+          <div class="chart-title">📊 تحليل نتيجتك</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;">
+            <div class="gauge-container">
+              <canvas id="gaugeChart" width="280" height="180"></canvas>
+              <div class="gauge-value">
+                <span class="percent" id="percentDisplay">0%</span>
+                <span class="label">من الحد الأقصى</span>
+              </div>
+            </div>
+            <div class="score-breakdown" id="scoreBreakdown"></div>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div style="background:white;border-radius:12px;padding:2rem;box-shadow:0 4px 6px rgba(0,0,0,.05);border:1px solid #e2e8f0;margin-bottom:2rem;">
+          <h3 style="margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem;">💡 التوصيات</h3>
+          <div id="recommendations" style="color:#475569;line-height:1.9;font-size:.95rem;"></div>
+        </div>
+
+        <!-- Answers Review -->
+        <div class="answers-review">
+          <h3>📝 مراجعة إجاباتك</h3>
+          <div id="answersReview"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="result-actions">
+          <button onclick="retakeSurvey()" class="btn btn-primary btn-lg">🔄 إعادة الاختبار</button>
+          <a href="/surveys.html" class="btn btn-secondary btn-lg">📋 اختبارات أخرى</a>
+          <button onclick="shareResult()" class="btn btn-secondary btn-lg">📤 مشاركة النتيجة</button>
+          <button onclick="window.print()" class="btn btn-secondary btn-lg">🖨️ طباعة</button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div style="position:sticky;top:100px;">
+        <div class="ad-zone sidebar-ad" id="ad-sidebar" style="margin-bottom:1.5rem;">
+          <div class="ad-label">إعلان</div><span>مساحة إعلانية</span>
+        </div>
+
+        <!-- Score Summary Box -->
+        <div style="background:white;border-radius:12px;padding:1.5rem;border:1px solid #e2e8f0;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1rem;">
+          <h4 style="font-size:.95rem;margin-bottom:1rem;">📊 ملخص النتيجة</h4>
+          <div id="scoreSummaryBox" style="font-size:.9rem;color:#64748b;"></div>
+        </div>
+
+        <div class="ad-zone" id="ad-sidebar-2" style="min-height:160px;">
+          <div class="ad-label">إعلان</div><span>مساحة إعلانية</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer style="background:#1e293b;color:rgba(255,255,255,.6);padding:2rem;text-align:center;font-size:.85rem;margin-top:2rem;">
+  <p>© 2024 منصة ADHD | نتائج الاختبارات للأغراض التعليمية فقط وليست تشخيصاً طبياً</p>
+</footer>
+
+<script>
+const result = JSON.parse(sessionStorage.getItem('surveyResult') || 'null');
+
+if (!result) {
+  document.getElementById('noResultState').classList.remove('hidden');
+} else {
+  document.getElementById('resultsContent').classList.remove('hidden');
+  renderResults(result);
+  loadAds();
+}
+
+function renderResults(r) {
+  document.title = `نتيجة: ${r.resultLabel || 'اختبار ADHD'} | منصة ADHD`;
+
+  const colorMap = { '#28a745': '#10b981', '#ffc107': '#f59e0b', '#dc3545': '#ef4444' };
+  const color = colorMap[r.resultColor] || r.resultColor || '#4f46e5';
+  const iconMap = { '#10b981': '✅', '#f59e0b': '⚠️', '#ef4444': '🔴' };
+  const icon = iconMap[color] || '🧠';
+
+  document.getElementById('resultHeader').style.background = `linear-gradient(135deg, ${color}, ${color}cc)`;
+  document.getElementById('resultIcon').textContent = icon;
+  document.getElementById('resultSurveyTitle').textContent = r.surveyTitle || 'اختبار ADHD';
+  document.getElementById('resultLabel').textContent = r.resultLabel || '';
+  document.getElementById('resultScore').textContent = r.totalScore;
+  document.getElementById('resultMax').textContent = `من ${r.maxPossibleScore} نقطة`;
+  document.getElementById('resultBadge').style.background = `${color}18`;
+  document.getElementById('resultBadge').style.color = color;
+  document.getElementById('resultBadge').textContent = `${icon} ${r.resultLabel}`;
+  document.getElementById('resultDescription').textContent = r.resultDescription || '';
+
+  const pct = r.percentage || Math.round((r.totalScore / r.maxPossibleScore) * 100);
+  document.getElementById('percentDisplay').textContent = `${pct}%`;
+
+  // Score summary box
+  document.getElementById('scoreSummaryBox').innerHTML = `
+    <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #f1f5f9;">
+      <span>النقاط المكتسبة</span><strong>${r.totalScore}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #f1f5f9;">
+      <span>الحد الأقصى</span><strong>${r.maxPossibleScore}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:.5rem 0;">
+      <span>النسبة المئوية</span><strong style="color:${color}">${pct}%</strong>
+    </div>`;
+
+  // Draw gauge chart
+  drawGauge(pct, color);
+
+  // Score breakdown
+  const ranges = [
+    { label: 'منخفض (0-33%)', min: 0, max: 33, color: '#10b981' },
+    { label: 'متوسط (34-66%)', min: 34, max: 66, color: '#f59e0b' },
+    { label: 'مرتفع (67-100%)', min: 67, max: 100, color: '#ef4444' }
+  ];
+  const breakdown = document.getElementById('scoreBreakdown');
+  breakdown.innerHTML = '<h4 style="margin-bottom:1rem;font-size:.95rem;">تصنيف النتيجة</h4>';
+  ranges.forEach(range => {
+    const inRange = pct >= range.min && pct <= range.max;
+    breakdown.innerHTML += `
+      <div class="breakdown-item">
+        <div class="breakdown-header">
+          <span style="font-size:.85rem;${inRange?'font-weight:700;color:'+range.color:''}">${inRange?'◉ ':''} ${range.label}</span>
+        </div>
+        <div class="breakdown-bar">
+          <div class="breakdown-fill" style="background:${range.color};width:${inRange?100:0}%"></div>
+        </div>
+      </div>`;
+  });
+
+  // Recommendations
+  const recs = getRecommendations(pct, color);
+  document.getElementById('recommendations').innerHTML = recs;
+
+  // Answers review
+  if (r.answers && r.answers.length > 0) {
+    const reviewEl = document.getElementById('answersReview');
+    reviewEl.innerHTML = '';
+    r.answers.forEach((ans, i) => {
+      reviewEl.innerHTML += `
+        <div class="answer-review-item">
+          <div class="q-num">${i+1}</div>
+          <div class="q-content">
+            <div class="q-text">${ans.questionText}</div>
+            <div class="q-answer">الإجابة: ${ans.selectedOption}</div>
+          </div>
+          <div class="q-score">+${ans.score}</div>
+        </div>`;
+    });
+  } else {
+    document.getElementById('answersReview').innerHTML = '<p style="color:#94a3b8;text-align:center;padding:1rem;">لا تتوفر تفاصيل الإجابات</p>';
+  }
+}
+
+function drawGauge(percentage, color) {
+  const ctx = document.getElementById('gaugeChart').getContext('2d');
+  const value = percentage / 100;
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [value, 1 - value],
+        backgroundColor: [color, '#f1f5f9'],
+        borderWidth: 0,
+        circumference: 180,
+        rotation: 270
+      }]
+    },
+    options: {
+      cutout: '75%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      animation: { animateRotate: true, duration: 1500 }
+    }
+  });
+}
+
+function getRecommendations(pct, color) {
+  if (color === '#10b981' || pct <= 33) {
+    return `<ul style="padding-right:1.25rem;">
+      <li>نتيجتك تشير إلى أعراض ضمن النطاق الطبيعي.</li>
+      <li>استمر في الحفاظ على نمط حياة صحي مع ممارسة الرياضة والنوم الكافي.</li>
+      <li>إذا كانت لديك مخاوف، لا تتردد في استشارة طبيب.</li>
+      <li>يمكنك تجربة اختبارات أخرى للحصول على صورة أكمل.</li>
+    </ul>`;
+  } else if (color === '#f59e0b' || pct <= 66) {
+    return `<ul style="padding-right:1.25rem;">
+      <li>تظهر عليك بعض أعراض اضطراب ADHD. يُنصح بالتقييم المهني.</li>
+      <li>تحدث مع طبيبك أو معالج نفسي عن مخاوفك.</li>
+      <li>احرص على تنظيم وقتك واستخدام قوائم المهام.</li>
+      <li>مارس الرياضة بانتظام لأنها تساعد في تحسين التركيز.</li>
+      <li>جرب تقنيات اليقظة الذهنية والتأمل.</li>
+    </ul>`;
+  } else {
+    return `<ul style="padding-right:1.25rem;">
+      <li><strong>يُنصح بشدة باستشارة طبيب أو معالج نفسي متخصص في اضطراب ADHD.</strong></li>
+      <li>اطلب التقييم من متخصص لتحديد خطة العلاج المناسبة لك.</li>
+      <li>العلاج المتاح (دوائي وسلوكي) فعال جداً في إدارة الأعراض.</li>
+      <li>تذكر أن ADHD اضطراب قابل للإدارة وكثير من الناجحين يعانون منه.</li>
+      <li>ابحث عن مجموعات دعم وموارد للمساعدة في إدارة الحالة.</li>
+    </ul>`;
+  }
+}
+
+function retakeSurvey() {
+  const slug = result ? result.slug : null;
+  if (slug) window.location.href = `/survey.html?slug=${slug}`;
+  else window.location.href = '/surveys.html';
+}
+
+function shareResult() {
+  const text = `أكملت اختبار "${result.surveyTitle}" على منصة ADHD العربية\nالنتيجة: ${result.resultLabel}\nالنقاط: ${result.totalScore}/${result.maxPossibleScore}`;
+  if (navigator.share) {
+    navigator.share({ title: 'نتيجة اختبار ADHD', text, url: window.location.href });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text + '\n' + window.location.href);
+    alert('تم نسخ رابط النتيجة للحافظة!');
+  }
+}
+
+async function loadAds() {
+  for (const pos of ['results_page', 'sidebar']) {
+    try {
+      const res = await fetch(`/api/ads/${pos}`);
+      const data = await res.json();
+      if (data.success && data.data.length > 0) {
+        const ad = data.data[0];
+        const idMap = { results_page: 'ad-results-top', sidebar: 'ad-sidebar' };
+        const el = document.getElementById(idMap[pos]);
+        if (el && ad.content) el.innerHTML = ad.content;
+      }
+    } catch(e) {}
+  }
+}
+</script>
+</body>
+</html>

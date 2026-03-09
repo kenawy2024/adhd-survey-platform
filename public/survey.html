@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>اختبار ADHD | منصة ADHD العربية</title>
+  <meta name="description" content="اختبار تقييم اضطراب نقص الانتباه وفرط النشاط ADHD باللغة العربية"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="stylesheet" href="/css/survey.css"/>
+</head>
+<body class="survey-page">
+
+<nav class="navbar">
+  <div class="container">
+    <a href="/" class="navbar-brand"><div class="logo-icon">🧠</div><span>منصة ADHD</span></a>
+    <div class="navbar-nav" id="navMenu">
+      <a href="/">الرئيسية</a>
+      <a href="/surveys.html">الاستبيانات</a>
+      <a href="/about.html">عن ADHD</a>
+    </div>
+    <div class="navbar-actions">
+      <a href="/surveys.html" class="btn btn-secondary btn-sm">← جميع الاختبارات</a>
+      <button class="hamburger" onclick="document.getElementById('navMenu').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Loading State -->
+<div id="loadingState" style="text-align:center;padding:5rem 2rem;">
+  <div style="font-size:3rem;margin-bottom:1rem;animation:spin 1s linear infinite;display:inline-block;">⏳</div>
+  <p style="color:#64748b;">جاري تحميل الاختبار...</p>
+</div>
+
+<!-- Error State -->
+<div id="errorState" class="hidden" style="text-align:center;padding:5rem 2rem;">
+  <div style="font-size:3rem;margin-bottom:1rem;">❌</div>
+  <h2>الاختبار غير موجود</h2>
+  <p style="color:#64748b;margin:1rem 0;">لم يتم العثور على الاختبار المطلوب.</p>
+  <a href="/surveys.html" class="btn btn-primary">عرض جميع الاختبارات</a>
+</div>
+
+<!-- Survey Container -->
+<div id="surveyContainer" class="hidden">
+  <!-- Survey Header -->
+  <div class="survey-header">
+    <div class="container">
+      <div class="survey-header-inner">
+        <h1 id="surveyTitle">جاري التحميل...</h1>
+        <div class="survey-header-meta">
+          <span id="surveyQCount">⏳</span>
+          <span id="surveyTime">⏱️</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ad: Survey Top -->
+  <div class="container" style="margin-bottom:1rem;">
+    <div class="ad-zone in-content" id="ad-survey-top">
+      <div class="ad-label">إعلان</div><span>مساحة إعلانية</span>
+    </div>
+  </div>
+
+  <!-- Main Survey Layout -->
+  <div class="container">
+    <div class="survey-layout">
+
+      <!-- Survey Content -->
+      <div>
+        <!-- Progress -->
+        <div class="progress-section">
+          <div class="progress-info">
+            <span class="progress-label">تقدمك في الاختبار</span>
+            <span class="progress-fraction" id="progressFraction">0 / 0</span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="question-card" id="questionCard">
+          <div class="question-number" id="questionNumber">1</div>
+          <p class="question-text" id="questionText">جاري التحميل...</p>
+          <div class="answer-options" id="answerOptions"></div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="survey-navigation">
+          <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()" style="display:none;">← السابق</button>
+          <div class="nav-dots" id="navDots"></div>
+          <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">التالي ←</button>
+        </div>
+
+        <!-- Ad between questions -->
+        <div id="inQuestionAd" class="hidden">
+          <div class="ad-zone in-content">
+            <div class="ad-label">إعلان</div><span>مساحة إعلانية</span>
+          </div>
+        </div>
+
+        <!-- Submit Section -->
+        <div class="submit-section hidden" id="submitSection">
+          <div style="background:rgba(79,70,229,.05);border:1px solid rgba(79,70,229,.2);border-radius:12px;padding:2rem;margin-bottom:1.5rem;">
+            <div style="font-size:2rem;margin-bottom:.75rem;">✅</div>
+            <h3 style="margin-bottom:.75rem;">أجبت على جميع الأسئلة!</h3>
+            <p style="color:#64748b;">راجع إجاباتك إن شئت ثم اضغط "عرض النتيجة" لرؤية تقييمك.</p>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="submitSurvey()" id="submitBtn">
+            🎯 عرض نتيجتي
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="survey-sidebar">
+        <div class="ad-zone sidebar-ad" id="ad-sidebar">
+          <div class="ad-label">إعلان</div><span>مساحة إعلانية 300×600</span>
+        </div>
+
+        <div style="background:white;border-radius:12px;padding:1.25rem;border:1px solid #e2e8f0;margin-top:1.5rem;box-shadow:0 4px 6px rgba(0,0,0,.05);">
+          <h4 style="font-size:.95rem;margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem;">📋 إجاباتي</h4>
+          <div id="answersSummary" style="display:flex;flex-direction:column;gap:.4rem;font-size:.85rem;color:#64748b;">
+            <p>لم تجب على أي سؤال بعد</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:1.25rem;margin-top:1rem;">
+          <p style="font-size:.82rem;color:#78350f;line-height:1.8;">⚠️ هذا الاختبار للفحص الذاتي فقط وليس تشخيصاً طبياً.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer style="background:#1e293b;color:rgba(255,255,255,.6);padding:1.5rem;text-align:center;font-size:.85rem;margin-top:4rem;">
+  <p>© 2024 منصة ADHD | <a href="/" style="color:rgba(255,255,255,.6);">الرئيسية</a> | <a href="/surveys.html" style="color:rgba(255,255,255,.6);">الاختبارات</a></p>
+</footer>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+let survey = null;
+let currentQuestion = 0;
+let answers = {};
+let sessionId = Math.random().toString(36).substring(2);
+
+const params = new URLSearchParams(window.location.search);
+const slug = params.get('slug');
+
+async function loadSurvey() {
+  if (!slug) { showError(); return; }
+  try {
+    const res = await fetch(`/api/surveys/${slug}`);
+    const data = await res.json();
+    if (!data.success) { showError(); return; }
+    survey = data.data;
+
+    document.title = `${survey.title} | منصة ADHD`;
+    document.getElementById('surveyTitle').innerHTML = `${survey.icon || '🧠'} ${survey.title}`;
+    document.getElementById('surveyQCount').textContent = `❓ ${survey.questions.length} سؤال`;
+    document.getElementById('surveyTime').textContent = `⏱️ ${survey.estimatedMinutes} دقائق`;
+
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('surveyContainer').classList.remove('hidden');
+
+    buildNavDots();
+    showQuestion(0);
+    loadAds();
+  } catch(e) { showError(); }
+}
+
+function showError() {
+  document.getElementById('loadingState').classList.add('hidden');
+  document.getElementById('errorState').classList.remove('hidden');
+}
+
+function buildNavDots() {
+  const dotsEl = document.getElementById('navDots');
+  dotsEl.innerHTML = '';
+  survey.questions.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot' + (i === 0 ? ' current' : '');
+    dot.title = `السؤال ${i + 1}`;
+    dot.onclick = () => goToQuestion(i);
+    dotsEl.appendChild(dot);
+  });
+}
+
+function updateNavDots() {
+  const dots = document.querySelectorAll('.nav-dot');
+  dots.forEach((dot, i) => {
+    dot.className = 'nav-dot';
+    if (answers[i] !== undefined) dot.classList.add('answered');
+    if (i === currentQuestion) dot.classList.add('current');
+  });
+}
+
+function showQuestion(index) {
+  currentQuestion = index;
+  const q = survey.questions[index];
+  const total = survey.questions.length;
+
+  document.getElementById('questionNumber').textContent = index + 1;
+  document.getElementById('questionText').textContent = q.text;
+  document.getElementById('progressFraction').textContent = `${index + 1} / ${total}`;
+  document.getElementById('progressBar').style.width = `${((index + 1) / total) * 100}%`;
+
+  // Build options
+  const optionsEl = document.getElementById('answerOptions');
+  optionsEl.innerHTML = '';
+  q.answerOptions.forEach(opt => {
+    const div = document.createElement('label');
+    div.className = 'answer-option' + (answers[index] === opt.text ? ' selected' : '');
+    div.innerHTML = `
+      <input type="radio" name="q${index}" value="${opt.text}" ${answers[index] === opt.text ? 'checked' : ''}/>
+      <div class="radio-custom"></div>
+      <span class="answer-text">${opt.text}</span>`;
+    div.onclick = () => selectAnswer(index, opt.text, div);
+    optionsEl.appendChild(div);
+  });
+
+  // Navigation buttons
+  document.getElementById('prevBtn').style.display = index === 0 ? 'none' : '';
+  const nextBtn = document.getElementById('nextBtn');
+  if (index === total - 1) {
+    nextBtn.classList.add('hidden');
+    checkAllAnswered();
+  } else {
+    nextBtn.classList.remove('hidden');
+    document.getElementById('submitSection').classList.add('hidden');
+  }
+
+  // Show in-question ad every 5 questions
+  const adEl = document.getElementById('inQuestionAd');
+  if (index > 0 && index % 5 === 0) adEl.classList.remove('hidden');
+  else adEl.classList.add('hidden');
+
+  updateNavDots();
+  updateAnswersSummary();
+
+  // Animate
+  document.getElementById('questionCard').style.animation = 'none';
+  void document.getElementById('questionCard').offsetWidth;
+  document.getElementById('questionCard').style.animation = 'fadeSlide .4s ease';
+}
+
+function selectAnswer(index, value, el) {
+  answers[index] = value;
+  document.querySelectorAll('.answer-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  updateNavDots();
+  updateAnswersSummary();
+  checkAllAnswered();
+
+  // Auto advance after 600ms
+  if (currentQuestion < survey.questions.length - 1) {
+    setTimeout(() => { if (answers[currentQuestion] === value) nextQuestion(); }, 700);
+  }
+}
+
+function nextQuestion() {
+  if (currentQuestion < survey.questions.length - 1) showQuestion(currentQuestion + 1);
+}
+function prevQuestion() {
+  if (currentQuestion > 0) showQuestion(currentQuestion - 1);
+}
+function goToQuestion(i) { showQuestion(i); }
+
+function checkAllAnswered() {
+  const allAnswered = survey.questions.every((_, i) => answers[i] !== undefined);
+  if (allAnswered) document.getElementById('submitSection').classList.remove('hidden');
+}
+
+function updateAnswersSummary() {
+  const el = document.getElementById('answersSummary');
+  const answered = Object.keys(answers).length;
+  const total = survey.questions ? survey.questions.length : 0;
+  if (answered === 0) { el.innerHTML = '<p>لم تجب على أي سؤال بعد</p>'; return; }
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+      <span>الإجابات</span>
+      <span style="font-weight:700;color:#4f46e5;">${answered}/${total}</span>
+    </div>
+    <div style="background:#e2e8f0;border-radius:50px;height:6px;overflow:hidden;">
+      <div style="background:#4f46e5;height:100%;width:${(answered/total)*100}%;border-radius:50px;transition:width .3s;"></div>
+    </div>`;
+}
+
+async function submitSurvey() {
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = '⏳ جاري الحساب...';
+  btn.disabled = true;
+
+  const payload = {
+    sessionId,
+    answers: survey.questions.map((q, i) => ({
+      questionId: q._id,
+      selectedOption: answers[i] || ''
+    })).filter(a => a.selectedOption)
+  };
+
+  try {
+    const res = await fetch(`/api/surveys/${slug}/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      const result = data.data;
+      sessionStorage.setItem('surveyResult', JSON.stringify({
+        ...result,
+        surveyTitle: survey.title,
+        surveyIcon: survey.icon,
+        slug
+      }));
+      window.location.href = '/results.html';
+    } else {
+      btn.textContent = '🎯 عرض نتيجتي';
+      btn.disabled = false;
+      alert('حدث خطأ. يرجى المحاولة مرة أخرى.');
+    }
+  } catch(e) {
+    btn.textContent = '🎯 عرض نتيجتي';
+    btn.disabled = false;
+    alert('خطأ في الاتصال بالخادم.');
+  }
+}
+
+async function loadAds() {
+  for (const pos of ['survey_top', 'sidebar', 'between_questions']) {
+    try {
+      const res = await fetch(`/api/ads/${pos}`);
+      const data = await res.json();
+      if (data.success && data.data.length > 0) {
+        const ad = data.data[0];
+        const idMap = { survey_top: 'ad-survey-top', sidebar: 'ad-sidebar', between_questions: 'inQuestionAd' };
+        const el = document.getElementById(idMap[pos]);
+        if (el && ad.content) el.innerHTML = ad.content;
+      }
+    } catch(e) {}
+  }
+}
+
+loadSurvey();
+</script>
+</body>
+</html>

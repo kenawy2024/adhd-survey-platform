@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>منصة ADHD | اختبارات اضطراب نقص الانتباه وفرط النشاط بالعربي</title>
+  <meta name="description" content="منصة عربية متخصصة في اختبارات وتقييم اضطراب نقص الانتباه وفرط النشاط ADHD. أكثر من 5 اختبارات احترافية باللغة العربية."/>
+  <meta name="keywords" content="ADHD, اضطراب نقص الانتباه, فرط النشاط, اختبار ADHD, تقييم ADHD, اضطراب الانتباه"/>
+  <meta property="og:title" content="منصة ADHD - اختبارات اضطراب نقص الانتباه بالعربي"/>
+  <meta property="og:description" content="اختبارات احترافية لتقييم اضطراب نقص الانتباه وفرط النشاط ADHD باللغة العربية"/>
+  <meta property="og:type" content="website"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"WebSite","name":"منصة ADHD","description":"منصة عربية متخصصة في اختبارات اضطراب ADHD","inLanguage":"ar"}
+  </script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container">
+    <a href="/" class="navbar-brand">
+      <div class="logo-icon">🧠</div>
+      <span>منصة ADHD</span>
+    </a>
+    <div class="navbar-nav" id="navMenu">
+      <a href="/" class="active">الرئيسية</a>
+      <a href="/surveys.html">الاستبيانات</a>
+      <a href="/about.html">عن ADHD</a>
+    </div>
+    <div class="navbar-actions">
+      <a href="/surveys.html" class="btn btn-primary btn-sm">ابدأ الاختبار</a>
+      <button class="hamburger" onclick="toggleNav()" aria-label="القائمة">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- AD: Homepage Banner -->
+<div id="ad-homepage-banner" class="container" style="margin-top:1rem;">
+  <div class="ad-zone banner" id="ad-banner-content">
+    <div class="ad-label">إعلان</div>
+    <span>مساحة إعلانية 728×90</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="badge badge-primary" style="background:rgba(255,255,255,.15);color:white;margin-bottom:1rem;">
+        🌟 منصة متخصصة في اضطراب ADHD
+      </div>
+      <h1>اكتشف هل تعاني من<br/>اضطراب <span style="color:#a5b4fc">ADHD</span>؟</h1>
+      <p>خمسة اختبارات احترافية باللغة العربية لتقييم اضطراب نقص الانتباه وفرط النشاط. نتائج فورية مع تفسير شامل ومبني على أسس علمية معتمدة.</p>
+      <div class="hero-actions">
+        <a href="/surveys.html" class="btn btn-light btn-lg">ابدأ الاختبار الآن 🚀</a>
+        <a href="/about.html" class="btn btn-secondary btn-lg" style="background:transparent;color:white;border-color:rgba(255,255,255,.4)">تعرف على ADHD</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="number" id="totalResponses">0</span><span class="label">إجمالي الاختبارات</span></div>
+        <div class="stat-item"><span class="number">5</span><span class="label">اختبار متخصص</span></div>
+        <div class="stat-item"><span class="number">100%</span><span class="label">مجاناً</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-grid">
+        <div class="hero-card"><span class="icon">📋</span><h3>مقياس ASRS</h3></div>
+        <div class="hero-card"><span class="icon">🎯</span><h3>اختبار الانتباه</h3></div>
+        <div class="hero-card"><span class="icon">⚡</span><h3>اختبار الاندفاعية</h3></div>
+        <div class="hero-card"><span class="icon">🏃</span><h3>اختبار النشاط</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SURVEYS SECTION -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <div class="subtitle">اختبارات معتمدة</div>
+      <h2>اختر اختبارك المناسب</h2>
+      <p>اختبارات مبنية على مقاييس علمية معتمدة دولياً لتقييم اضطراب نقص الانتباه وفرط النشاط</p>
+    </div>
+    <div class="surveys-grid" id="surveysGrid">
+      <!-- Loaded dynamically -->
+      <div class="survey-card" style="opacity:.5">
+        <div class="survey-card-header"><span class="survey-card-icon">⏳</span><h3>جاري التحميل...</h3></div>
+        <div class="survey-card-body"><p>يتم تحميل الاختبارات...</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INFO SECTION -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="subtitle">معلومات مهمة</div>
+      <h2>ما هو اضطراب ADHD؟</h2>
+      <p>اضطراب نقص الانتباه وفرط النشاط من أكثر الاضطرابات العصبية النفسية انتشاراً لدى الأطفال والبالغين</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-card-icon">🧠</div>
+        <h3>ما هو ADHD؟</h3>
+        <p>اضطراب عصبي يؤثر على الانتباه والتركيز والسيطرة على الاندفاعية والنشاط الحركي الزائد</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">📊</div>
+        <h3>الانتشار</h3>
+        <p>يؤثر على 5-7% من الأطفال و2.5-4% من البالغين حول العالم</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🎭</div>
+        <h3>الأنواع الثلاثة</h3>
+        <p>نقص الانتباه، فرط النشاط والاندفاعية، أو النوع المدمج الذي يجمع الاثنين معاً</p>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">💊</div>
+        <h3>العلاج</h3>
+        <p>يمكن إدارته بفعالية من خلال العلاج الدوائي والسلوكي والتدريب على المهارات</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:2.5rem;">
+      <a href="/about.html" class="btn btn-primary">اقرأ المزيد عن ADHD</a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES SECTION -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <div class="subtitle">مميزات المنصة</div>
+      <h2>لماذا تختار منصتنا؟</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon">🏆</div>
+        <div class="feature-content"><h3>اختبارات علمية معتمدة</h3><p>مبنية على مقاييس دولية موثوقة كمقياس ASRS ومقاييس أخرى</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-content"><h3>نتائج فورية</h3><p>احصل على تقييم شامل ومفصل فور الانتهاء من الاختبار</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-content"><h3>خصوصية تامة</h3><p>لا يتم جمع بيانات شخصية، اختباراتك خاصة وسرية</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📱</div>
+        <div class="feature-content"><h3>يعمل على جميع الأجهزة</h3><p>متوافق مع الجوال والتابلت والكمبيوتر بتصميم احترافي</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">🌐</div>
+        <div class="feature-content"><h3>عربي بالكامل</h3><p>واجهة عربية RTL احترافية مصممة خصيصاً للمستخدم العربي</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon">📈</div>
+        <div class="feature-content"><h3>تقارير مرئية</h3><p>رسوم بيانية وتصورات مرئية لفهم نتيجتك بشكل أوضح</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AD: Footer -->
+<div class="container" style="padding:2rem 1.5rem 0;">
+  <div class="ad-zone banner" id="ad-footer-content">
+    <div class="ad-label">إعلان</div>
+    <span>مساحة إعلانية</span>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="disclaimer">
+      ⚠️ <strong>تنبيه طبي مهم:</strong> الاختبارات المقدمة في هذه المنصة هي أدوات للفحص الذاتي فقط ولا تُعدّ تشخيصاً طبياً. يُنصح باستشارة طبيب أو معالج نفسي متخصص للحصول على تشخيص دقيق.
+    </div>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><div class="logo-icon">🧠</div> منصة ADHD</div>
+        <p class="footer-desc">منصة عربية متخصصة في تقييم اضطراب نقص الانتباه وفرط النشاط. نقدم اختبارات علمية معتمدة لمساعدتك في فهم حالتك بشكل أفضل.</p>
+      </div>
+      <div class="footer-links">
+        <h4>الاختبارات</h4>
+        <ul>
+          <li><a href="/surveys.html">جميع الاختبارات</a></li>
+          <li><a href="/survey.html?slug=asrs-adult-adhd-self-report">مقياس ASRS</a></li>
+          <li><a href="/survey.html?slug=attention-difficulty-test">اختبار الانتباه</a></li>
+          <li><a href="/survey.html?slug=impulsivity-self-control-test">اختبار الاندفاعية</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>روابط سريعة</h4>
+        <ul>
+          <li><a href="/">الرئيسية</a></li>
+          <li><a href="/about.html">عن ADHD</a></li>
+          <li><a href="/surveys.html">الاستبيانات</a></li>
+          <li><a href="/admin/login.html">لوحة التحكم</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>معلومات</h4>
+        <ul>
+          <li><a href="/about.html#symptoms">أعراض ADHD</a></li>
+          <li><a href="/about.html#types">أنواع ADHD</a></li>
+          <li><a href="/about.html#treatment">العلاج</a></li>
+          <li><a href="/about.html#adults">ADHD في البالغين</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 منصة ADHD - جميع الحقوق محفوظة</p>
+      <p>هذه الاختبارات للأغراض التعليمية والتوعوية فقط</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleNav() {
+  document.getElementById('navMenu').classList.toggle('open');
+}
+
+async function loadSurveys() {
+  try {
+    const res = await fetch('/api/surveys');
+    const data = await res.json();
+    if (!data.success) return;
+
+    const grid = document.getElementById('surveysGrid');
+    grid.innerHTML = '';
+
+    let totalResponses = 0;
+    data.data.forEach(survey => {
+      totalResponses += survey.totalResponses || 0;
+      grid.innerHTML += `
+        <div class="survey-card">
+          <div class="survey-card-header">
+            <span class="survey-card-badge">ADHD</span>
+            <span class="survey-card-icon">${survey.icon || '🧠'}</span>
+            <h3>${survey.title}</h3>
+          </div>
+          <div class="survey-card-body">
+            <p>${survey.description}</p>
+            <div class="survey-meta">
+              <span>⏱️ ${survey.estimatedMinutes} دقائق</span>
+              <span>❓ ${survey.questions ? survey.questions.length : '...'} سؤال</span>
+              <span>👥 ${survey.totalResponses || 0} مشارك</span>
+            </div>
+          </div>
+          <div class="survey-card-footer">
+            <a href="/survey.html?slug=${survey.slug}" class="btn btn-primary" style="width:100%;justify-content:center;">
+              ابدأ الاختبار <span>←</span>
+            </a>
+          </div>
+        </div>`;
+    });
+
+    document.getElementById('totalResponses').textContent = totalResponses.toLocaleString('ar');
+  } catch(e) {
+    document.getElementById('surveysGrid').innerHTML = '<p style="text-align:center;color:#64748b;padding:2rem;">تعذر تحميل الاختبارات. تأكد من تشغيل الخادم.</p>';
+  }
+}
+
+async function loadAds() {
+  try {
+    const positions = ['homepage_banner', 'footer'];
+    for (const pos of positions) {
+      const res = await fetch(`/api/ads/${pos}`);
+      const data = await res.json();
+      if (data.success && data.data.length > 0) {
+        const ad = data.data[0];
+        const el = document.getElementById(`ad-${pos.replace('_','-')}-content`);
+        if (el && ad.content) { el.parentElement.innerHTML = ad.content; }
+        else if (el && ad.type === 'adsense' && ad.adsenseClient) {
+          el.innerHTML = `<ins class="adsbygoogle" style="display:block" data-ad-client="${ad.adsenseClient}" data-ad-slot="${ad.adsenseSlot}" data-ad-format="auto"></ins>`;
+        }
+      }
+    }
+  } catch(e) {}
+}
+
+loadSurveys();
+loadAds();
+</script>
+</body>
+</html>

@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>لوحة التحكم - منصة ADHD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/admin.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="robots" content="noindex"/>
+</head>
+<body class="admin-body">
+
+<div class="admin-layout">
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-sidebar-header">
+      <div class="admin-logo">
+        <div class="logo-icon">🧠</div>
+        <span>لوحة التحكم</span>
+      </div>
+    </div>
+
+    <nav class="admin-nav">
+      <div class="admin-nav-section">الرئيسية</div>
+      <a href="#" onclick="showSection('dashboard')" class="active" id="nav-dashboard">
+        <span class="nav-icon">📊</span> الإحصائيات
+      </a>
+
+      <div class="admin-nav-section">الاستبيانات</div>
+      <a href="#" onclick="showSection('surveys')" id="nav-surveys">
+        <span class="nav-icon">📋</span> الاستبيانات
+      </a>
+      <a href="#" onclick="showSection('responses')" id="nav-responses">
+        <span class="nav-icon">📝</span> الإجابات
+      </a>
+
+      <div class="admin-nav-section">الإعلانات</div>
+      <a href="#" onclick="showSection('ads')" id="nav-ads">
+        <span class="nav-icon">📢</span> إدارة الإعلانات
+      </a>
+
+      <div class="admin-nav-section">الموقع</div>
+      <a href="/" target="_blank">
+        <span class="nav-icon">🌐</span> عرض الموقع
+      </a>
+    </nav>
+
+    <div class="admin-sidebar-footer">
+      <div class="admin-user">
+        <div class="admin-avatar" id="adminAvatar">A</div>
+        <div>
+          <div class="admin-username" id="adminUsername">المسؤول</div>
+          <div class="admin-role">مدير النظام</div>
+        </div>
+      </div>
+      <button onclick="logout()" style="margin-top:.75rem;width:100%;background:rgba(239,68,68,.1);color:#ef4444;border:none;padding:.6rem;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:600;">
+        تسجيل الخروج
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <button onclick="toggleSidebar()" style="border:none;background:#f1f5f9;border-radius:8px;padding:.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;width:36px;height:36px;">☰</button>
+        <span class="topbar-title" id="topbarTitle">لوحة الإحصائيات</span>
+      </div>
+      <div class="topbar-actions">
+        <span style="font-size:.85rem;color:#64748b;" id="topbarDate"></span>
+        <a href="/surveys.html" target="_blank" class="btn btn-secondary btn-sm">🌐 الموقع</a>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <!-- =================== DASHBOARD SECTION =================== -->
+      <section id="section-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon blue">📋</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-surveys">-</div>
+              <div class="stat-label">الاستبيانات النشطة</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">👥</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-responses">-</div>
+              <div class="stat-label">إجمالي الإجابات</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">📊</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-today">-</div>
+              <div class="stat-label">إجابات اليوم</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">📢</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-ads">-</div>
+              <div class="stat-label">الإعلانات النشطة</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+          <!-- Daily Chart -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>📈 الإجابات خلال آخر 7 أيام</h3>
+            </div>
+            <div class="admin-card-body">
+              <canvas id="dailyChart" height="200"></canvas>
+            </div>
+          </div>
+
+          <!-- Survey Popularity -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h3>🏆 الاستبيانات الأكثر شعبية</h3>
+            </div>
+            <div class="admin-card-body" id="surveyPopularity">
+              <div style="color:#94a3b8;text-align:center;padding:2rem;">جاري التحميل...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Responses -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>🕐 آخر الإجابات</h3>
+            <button onclick="showSection('responses')" class="btn btn-secondary btn-sm">عرض الكل</button>
+          </div>
+          <div class="admin-card-body" style="padding:0;">
+            <table class="admin-table" id="recentTable">
+              <thead>
+                <tr>
+                  <th>الاستبيان</th>
+                  <th>النتيجة</th>
+                  <th>التصنيف</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="recentBody">
+                <tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:2rem;">جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== SURVEYS SECTION =================== -->
+      <section id="section-surveys" class="hidden">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📋 إدارة الاستبيانات</h3>
+            <button onclick="openSurveyModal()" class="btn btn-primary btn-sm">+ إضافة استبيان</button>
+          </div>
+          <div class="admin-card-body" style="padding:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>الاستبيان</th>
+                  <th>الأسئلة</th>
+                  <th>الإجابات</th>
+                  <th>متوسط النتيجة</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="surveysTable">
+                <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:2rem;">جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================== RESPONSES SECTION =================== -->
+      <section id="section-responses" class="hidden">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📝 سجل الإجابات</h3>
+            <div style="display:flex;gap:.75rem;align-items:center;">
+              <select id="responseFilter" class="form-control" style="width:200px;" onchange="filterResponses()">
+                <option value="">كل الاستبيانات</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-card-body" style="padding:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>الاستبيان</th>
+                  <th>النقاط</th>
+                  <th>النسبة</th>
+                  <th>التصنيف</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="responsesTable">
+                <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:2rem;">جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding:1rem 1.5rem;border-top:1px solid #f1f5f9;font-size:.85rem;color:#64748b;" id="responsesCount"></div>
+        </div>
+      </section>
+
+      <!-- =================== ADS SECTION =================== -->
+      <section id="section-ads" class="hidden">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3>📢 إدارة الإعلانات</h3>
+            <button onclick="openAdModal()" class="btn btn-primary btn-sm">+ إضافة إعلان</button>
+          </div>
+          <div class="admin-card-body" style="padding:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>الاسم</th>
+                  <th>الموقع</th>
+                  <th>النوع</th>
+                  <th>المشاهدات</th>
+                  <th>النقرات</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="adsTable">
+                <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:2rem;">جاري التحميل...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Ad Positions Guide -->
+        <div class="admin-card" style="margin-top:1.5rem;">
+          <div class="admin-card-header"><h3>📍 دليل مواضع الإعلانات</h3></div>
+          <div class="admin-card-body">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+              ${[
+                {pos:'homepage_banner', name:'بانر الصفحة الرئيسية', size:'728×90'},
+                {pos:'sidebar', name:'الشريط الجانبي', size:'300×250'},
+                {pos:'survey_top', name:'أعلى صفحة الاستبيان', size:'728×90'},
+                {pos:'between_questions', name:'بين الأسئلة', size:'336×280'},
+                {pos:'results_page', name:'صفحة النتائج', size:'728×90'},
+                {pos:'footer', name:'أسفل الموقع', size:'728×90'}
+              ].map(p => `
+                <div style="background:#f8fafc;border-radius:8px;padding:1rem;text-align:center;">
+                  <div style="font-size:.75rem;color:#94a3b8;font-family:monospace;margin-bottom:.4rem;">${p.pos}</div>
+                  <div style="font-weight:600;font-size:.9rem;color:#1e293b;">${p.name}</div>
+                  <div style="font-size:.8rem;color:#64748b;">${p.size}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- Survey Modal -->
+<div class="modal-overlay hidden" id="surveyModal">
+  <div class="modal" style="max-width:900px;">
+    <div class="modal-header">
+      <h3 id="surveyModalTitle">إضافة استبيان جديد</h3>
+      <button class="modal-close" onclick="closeSurveyModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="surveyEditId"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">عنوان الاستبيان *</label>
+          <input type="text" id="surveyTitleInput" class="form-control" placeholder="عنوان الاستبيان بالعربي"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الأيقونة</label>
+          <input type="text" id="surveyIcon" class="form-control" placeholder="🧠" maxlength="5"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">الوصف *</label>
+        <textarea id="surveyDesc" class="form-control" rows="3" placeholder="وصف مختصر للاستبيان..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">الوقت المقدر (دقائق)</label>
+          <input type="number" id="surveyTime" class="form-control" value="5" min="1" max="60"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الحالة</label>
+          <select id="surveyActive" class="form-control">
+            <option value="true">نشط</option>
+            <option value="false">غير نشط</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Questions Builder -->
+      <div style="margin-top:1.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <h4>الأسئلة</h4>
+          <button onclick="addQuestion()" class="btn btn-success btn-sm">+ إضافة سؤال</button>
+        </div>
+        <div id="questionsBuilder"></div>
+      </div>
+
+      <!-- Scoring Rules -->
+      <div style="margin-top:1.5rem;">
+        <h4 style="margin-bottom:1rem;">قواعد التقييم</h4>
+        <div id="scoringRules">
+          <div class="question-builder-item" style="background:rgba(16,185,129,.06);border-color:rgba(16,185,129,.2);">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">النقاط من</label><input type="number" class="form-control rule-min" placeholder="0"/></div>
+              <div class="form-group"><label class="form-label">النقاط إلى</label><input type="number" class="form-control rule-max" placeholder="20"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">التصنيف</label><input type="text" class="form-control rule-label" placeholder="احتمال منخفض"/></div>
+              <div class="form-group"><label class="form-label">اللون</label><input type="color" class="form-control rule-color" value="#28a745" style="height:44px;"/></div>
+            </div>
+            <div class="form-group"><label class="form-label">التفسير</label><textarea class="form-control rule-desc" rows="2" placeholder="وصف هذه النتيجة..."></textarea></div>
+          </div>
+          <div class="question-builder-item" style="background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">النقاط من</label><input type="number" class="form-control rule-min" placeholder="21"/></div>
+              <div class="form-group"><label class="form-label">النقاط إلى</label><input type="number" class="form-control rule-max" placeholder="40"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">التصنيف</label><input type="text" class="form-control rule-label" placeholder="احتمال متوسط"/></div>
+              <div class="form-group"><label class="form-label">اللون</label><input type="color" class="form-control rule-color" value="#ffc107" style="height:44px;"/></div>
+            </div>
+            <div class="form-group"><label class="form-label">التفسير</label><textarea class="form-control rule-desc" rows="2" placeholder="وصف هذه النتيجة..."></textarea></div>
+          </div>
+          <div class="question-builder-item" style="background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.2);">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">النقاط من</label><input type="number" class="form-control rule-min" placeholder="41"/></div>
+              <div class="form-group"><label class="form-label">النقاط إلى</label><input type="number" class="form-control rule-max" placeholder="60"/></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">التصنيف</label><input type="text" class="form-control rule-label" placeholder="احتمال مرتفع"/></div>
+              <div class="form-group"><label class="form-label">اللون</label><input type="color" class="form-control rule-color" value="#dc3545" style="height:44px;"/></div>
+            </div>
+            <div class="form-group"><label class="form-label">التفسير</label><textarea class="form-control rule-desc" rows="2" placeholder="وصف هذه النتيجة..."></textarea></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeSurveyModal()" class="btn btn-secondary">إلغاء</button>
+      <button onclick="saveSurvey()" class="btn btn-primary" id="saveSurveyBtn">حفظ الاستبيان</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ad Modal -->
+<div class="modal-overlay hidden" id="adModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <h3 id="adModalTitle">إضافة إعلان جديد</h3>
+      <button class="modal-close" onclick="closeAdModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="adEditId"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">اسم الإعلان *</label>
+          <input type="text" id="adName" class="form-control" placeholder="اسم الإعلان للتعرف عليه"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الموقع *</label>
+          <select id="adPosition" class="form-control">
+            <option value="homepage_banner">بانر الصفحة الرئيسية</option>
+            <option value="sidebar">الشريط الجانبي</option>
+            <option value="survey_top">أعلى صفحة الاستبيان</option>
+            <option value="between_questions">بين الأسئلة</option>
+            <option value="results_page">صفحة النتائج</option>
+            <option value="footer">أسفل الموقع</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">نوع الإعلان</label>
+        <select id="adType" class="form-control" onchange="toggleAdFields()">
+          <option value="adsense">Google AdSense</option>
+          <option value="custom_html">HTML مخصص</option>
+          <option value="image">صورة</option>
+        </select>
+      </div>
+      <div id="adsenseFields">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Publisher ID (data-ad-client)</label>
+            <input type="text" id="adClient" class="form-control" placeholder="ca-pub-XXXXXXXXXXXXXXXX"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ad Slot (data-ad-slot)</label>
+            <input type="text" id="adSlot" class="form-control" placeholder="1234567890"/>
+          </div>
+        </div>
+      </div>
+      <div id="customHtmlFields" class="hidden">
+        <div class="form-group">
+          <label class="form-label">كود HTML الإعلان</label>
+          <textarea id="adContent" class="form-control" rows="5" placeholder="الصق كود الإعلان هنا..." style="font-family:monospace;font-size:.85rem;"></textarea>
+        </div>
+      </div>
+      <div id="imageAdFields" class="hidden">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">رابط الصورة</label>
+            <input type="url" id="adImageUrl" class="form-control" placeholder="https://..."/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">رابط الوجهة</label>
+            <input type="url" id="adLinkUrl" class="form-control" placeholder="https://..."/>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-check">
+          <input type="checkbox" id="adActive" checked/> تفعيل الإعلان فوراً
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeAdModal()" class="btn btn-secondary">إلغاء</button>
+      <button onclick="saveAd()" class="btn btn-primary">حفظ الإعلان</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay hidden" id="confirmModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3>⚠️ تأكيد الحذف</h3>
+      <button class="modal-close" onclick="document.getElementById('confirmModal').classList.add('hidden')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p id="confirmMsg" style="color:#475569;font-size:1rem;"></p>
+    </div>
+    <div class="modal-footer">
+      <button onclick="document.getElementById('confirmModal').classList.add('hidden')" class="btn btn-secondary">إلغاء</button>
+      <button onclick="confirmDeleteAction()" class="btn btn-danger" id="confirmDeleteBtn">حذف</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let token = localStorage.getItem('adminToken');
+let allSurveys = [];
+let allResponses = [];
+let deleteCallback = null;
+let questionCount = 0;
+
+// Auth check
+if (!token) { window.location.href = '/admin/login.html'; }
+
+// Set username
+const username = localStorage.getItem('adminUsername') || 'admin';
+document.getElementById('adminUsername').textContent = username;
+document.getElementById('adminAvatar').textContent = username.charAt(0).toUpperCase();
+
+// Set date
+document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('ar-SA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+}
+
+// ===================== NAV =====================
+function showSection(name) {
+  ['dashboard','surveys','responses','ads'].forEach(s => {
+    document.getElementById(`section-${s}`).classList.toggle('hidden', s !== name);
+    const nav = document.getElementById(`nav-${s}`);
+    if (nav) nav.classList.toggle('active', s === name);
+  });
+
+  const titles = { dashboard: 'لوحة الإحصائيات', surveys: 'إدارة الاستبيانات', responses: 'سجل الإجابات', ads: 'إدارة الإعلانات' };
+  document.getElementById('topbarTitle').textContent = titles[name] || '';
+
+  if (name === 'dashboard') loadDashboard();
+  else if (name === 'surveys') loadSurveys();
+  else if (name === 'responses') loadResponses();
+  else if (name === 'ads') loadAds();
+}
+
+function toggleSidebar() {
+  document.getElementById('adminSidebar').classList.toggle('open');
+}
+
+function logout() {
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('adminUsername');
+  window.location.href = '/admin/login.html';
+}
+
+// ===================== DASHBOARD =====================
+async function loadDashboard() {
+  try {
+    const res = await fetch('/api/admin/stats', { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) { if (res.status === 401) logout(); return; }
+    const d = data.data;
+
+    document.getElementById('stat-surveys').textContent = d.totalSurveys;
+    document.getElementById('stat-responses').textContent = d.totalResponses.toLocaleString('ar');
+    document.getElementById('stat-ads').textContent = '-';
+
+    // Today responses
+    const today = new Date().toISOString().slice(0,10);
+    const todayData = d.dailyResponses.find(r => r._id === today);
+    document.getElementById('stat-today').textContent = todayData ? todayData.count : 0;
+
+    // Daily chart
+    drawDailyChart(d.dailyResponses);
+
+    // Survey popularity
+    renderSurveyPopularity(d.surveys);
+
+    // Recent responses
+    renderRecentResponses(d.recentResponses);
+
+    // Load ads count
+    const adRes = await fetch('/api/admin/ads', { headers: authHeaders() });
+    const adData = await adRes.json();
+    if (adData.success) {
+      document.getElementById('stat-ads').textContent = adData.data.filter(a => a.isActive).length;
+    }
+  } catch(e) { console.error(e); }
+}
+
+function drawDailyChart(dailyData) {
+  const labels = [];
+  const counts = [];
+  const last7 = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    last7.push(d.toISOString().slice(0,10));
+  }
+  last7.forEach(date => {
+    labels.push(new Date(date).toLocaleDateString('ar-SA', { month:'short', day:'numeric' }));
+    const found = dailyData.find(r => r._id === date);
+    counts.push(found ? found.count : 0);
+  });
+
+  const ctx = document.getElementById('dailyChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{ label: 'عدد الإجابات', data: counts, backgroundColor: 'rgba(79,70,229,.7)', borderRadius: 8 }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+}
+
+function renderSurveyPopularity(surveys) {
+  const el = document.getElementById('surveyPopularity');
+  const max = Math.max(...surveys.map(s => s.totalResponses || 0)) || 1;
+  el.innerHTML = surveys.map(s => `
+    <div class="chart-bar-row">
+      <div class="chart-bar-label">${s.title.substring(0,18)}...</div>
+      <div class="chart-bar-track">
+        <div class="chart-bar-fill" style="width:${((s.totalResponses||0)/max)*100}%"></div>
+      </div>
+      <div class="chart-bar-value">${s.totalResponses||0}</div>
+    </div>`).join('') || '<p style="color:#94a3b8;text-align:center;">لا توجد بيانات</p>';
+}
+
+function renderRecentResponses(responses) {
+  const tbody = document.getElementById('recentBody');
+  if (!responses.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:2rem;">لا توجد إجابات بعد</td></tr>'; return; }
+  const colorMap = { 'احتمال منخفض': 'success', 'احتمال متوسط': 'warning', 'احتمال مرتفع': 'danger' };
+  tbody.innerHTML = responses.map(r => {
+    const label = r.resultLabel || '';
+    const badgeType = Object.keys(colorMap).find(k => label.includes(k.split(' ')[1])) || '';
+    const badge = colorMap[badgeType] || 'secondary';
+    return `<tr>
+      <td>${r.surveyTitle || '-'}</td>
+      <td><strong>${r.totalScore}</strong></td>
+      <td><span class="badge badge-${badge}">${label || '-'}</span></td>
+      <td style="color:#94a3b8;font-size:.85rem;">${new Date(r.completedAt).toLocaleDateString('ar-SA')}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===================== SURVEYS =====================
+async function loadSurveys() {
+  try {
+    const res = await fetch('/api/admin/surveys', { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) return;
+    allSurveys = data.data;
+    renderSurveysTable(data.data);
+
+    // Populate filter
+    const filter = document.getElementById('responseFilter');
+    filter.innerHTML = '<option value="">كل الاستبيانات</option>';
+    data.data.forEach(s => {
+      filter.innerHTML += `<option value="${s._id}">${s.title}</option>`;
+    });
+  } catch(e) { console.error(e); }
+}
+
+function renderSurveysTable(surveys) {
+  const tbody = document.getElementById('surveysTable');
+  if (!surveys.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:2rem;">لا توجد استبيانات</td></tr>'; return; }
+  tbody.innerHTML = surveys.map(s => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <span style="font-size:1.5rem;">${s.icon||'🧠'}</span>
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">${s.title}</div>
+            <div style="font-size:.75rem;color:#94a3b8;">${s.slug}</div>
+          </div>
+        </div>
+      </td>
+      <td>${s.questions ? s.questions.length : 0}</td>
+      <td>${(s.totalResponses||0).toLocaleString('ar')}</td>
+      <td>${s.averageScore||0}</td>
+      <td><span class="badge badge-${s.isActive?'success':'secondary'}">${s.isActive?'نشط':'معطل'}</span></td>
+      <td>
+        <div class="table-actions">
+          <button onclick="editSurvey('${s._id}')" class="btn btn-warning btn-sm">✏️</button>
+          <a href="/survey.html?slug=${s.slug}" target="_blank" class="btn btn-secondary btn-sm">👁️</a>
+          <button onclick="deleteSurvey('${s._id}','${s.title.replace(/'/g,'')}')" class="btn btn-danger btn-sm">🗑️</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+// ===================== SURVEY MODAL =====================
+function openSurveyModal() {
+  document.getElementById('surveyEditId').value = '';
+  document.getElementById('surveyModalTitle').textContent = 'إضافة استبيان جديد';
+  document.getElementById('surveyTitleInput').value = '';
+  document.getElementById('surveyDesc').value = '';
+  document.getElementById('surveyIcon').value = '🧠';
+  document.getElementById('surveyTime').value = '5';
+  document.getElementById('surveyActive').value = 'true';
+  document.getElementById('questionsBuilder').innerHTML = '';
+  questionCount = 0;
+  addQuestion();
+  document.getElementById('surveyModal').classList.remove('hidden');
+}
+
+function closeSurveyModal() { document.getElementById('surveyModal').classList.add('hidden'); }
+
+async function editSurvey(id) {
+  try {
+    const res = await fetch(`/api/admin/surveys/${id}`, { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) return;
+    const s = data.data;
+
+    document.getElementById('surveyEditId').value = s._id;
+    document.getElementById('surveyModalTitle').textContent = 'تعديل الاستبيان';
+    document.getElementById('surveyTitleInput').value = s.title;
+    document.getElementById('surveyDesc').value = s.description;
+    document.getElementById('surveyIcon').value = s.icon || '🧠';
+    document.getElementById('surveyTime').value = s.estimatedMinutes || 5;
+    document.getElementById('surveyActive').value = s.isActive ? 'true' : 'false';
+
+    // Load questions
+    document.getElementById('questionsBuilder').innerHTML = '';
+    questionCount = 0;
+    (s.questions || []).forEach(q => addQuestion(q.text, q.answerOptions));
+
+    // Load scoring rules
+    const rulesEls = document.querySelectorAll('.question-builder-item');
+    (s.scoringRules || []).forEach((rule, i) => {
+      if (rulesEls[i]) {
+        rulesEls[i].querySelector('.rule-min').value = rule.minScore;
+        rulesEls[i].querySelector('.rule-max').value = rule.maxScore;
+        rulesEls[i].querySelector('.rule-label').value = rule.label;
+        rulesEls[i].querySelector('.rule-desc').value = rule.description;
+        rulesEls[i].querySelector('.rule-color').value = rule.color || '#28a745';
+      }
+    });
+
+    document.getElementById('surveyModal').classList.remove('hidden');
+  } catch(e) { console.error(e); }
+}
+
+function addQuestion(text='', options=[]) {
+  questionCount++;
+  const defaultOptions = [
+    {text:'أبداً', score:0}, {text:'نادراً', score:1},
+    {text:'أحياناً', score:2}, {text:'غالباً', score:3}, {text:'دائماً', score:4}
+  ];
+  const opts = options.length ? options : defaultOptions;
+  const qn = questionCount;
+  const html = `
+    <div class="question-builder-item" id="qitem-${qn}">
+      <div class="question-builder-header">
+        <div class="q-num-badge">${qn}</div>
+        <input type="text" class="form-control q-text" placeholder="نص السؤال..." value="${text || ''}"/>
+        <button onclick="removeQuestion(${qn})" class="btn btn-danger btn-sm btn-icon">✕</button>
+      </div>
+      <div style="font-size:.8rem;color:#64748b;margin-bottom:.5rem;">الإجابات والنقاط:</div>
+      <div class="answer-builder">
+        ${opts.map((o,i) => `
+          <div class="answer-builder-item">
+            <label>${o.text}</label>
+            <input type="text" class="opt-text" value="${o.text}" placeholder="نص الإجابة"/>
+            <input type="number" class="opt-score" value="${o.score}" min="0" max="10" placeholder="نقاط"/>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  document.getElementById('questionsBuilder').insertAdjacentHTML('beforeend', html);
+}
+
+function removeQuestion(n) {
+  const el = document.getElementById(`qitem-${n}`);
+  if (el) el.remove();
+}
+
+async function saveSurvey() {
+  const btn = document.getElementById('saveSurveyBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ جاري الحفظ...';
+
+  const editId = document.getElementById('surveyEditId').value;
+
+  // Collect questions
+  const questions = [];
+  document.querySelectorAll('#questionsBuilder .question-builder-item').forEach((item, i) => {
+    const text = item.querySelector('.q-text').value.trim();
+    if (!text) return;
+    const opts = [];
+    const optTexts = item.querySelectorAll('.opt-text');
+    const optScores = item.querySelectorAll('.opt-score');
+    optTexts.forEach((t, j) => {
+      if (t.value.trim()) opts.push({ text: t.value.trim(), score: parseInt(optScores[j].value) || 0 });
+    });
+    questions.push({ text, order: i + 1, answerOptions: opts });
+  });
+
+  // Collect scoring rules
+  const scoringRules = [];
+  document.querySelectorAll('#scoringRules .question-builder-item').forEach(item => {
+    const min = parseInt(item.querySelector('.rule-min').value);
+    const max = parseInt(item.querySelector('.rule-max').value);
+    const label = item.querySelector('.rule-label').value.trim();
+    const desc = item.querySelector('.rule-desc').value.trim();
+    const color = item.querySelector('.rule-color').value;
+    if (label) scoringRules.push({ minScore: min||0, maxScore: max||0, label, description: desc, color });
+  });
+
+  const payload = {
+    title: document.getElementById('surveyTitleInput').value.trim(),
+    description: document.getElementById('surveyDesc').value.trim(),
+    icon: document.getElementById('surveyIcon').value.trim() || '🧠',
+    estimatedMinutes: parseInt(document.getElementById('surveyTime').value) || 5,
+    isActive: document.getElementById('surveyActive').value === 'true',
+    questions, scoringRules
+  };
+
+  try {
+    const url = editId ? `/api/admin/surveys/${editId}` : '/api/admin/surveys';
+    const method = editId ? 'PUT' : 'POST';
+    const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.success) {
+      closeSurveyModal();
+      loadSurveys();
+      showToast(editId ? 'تم تحديث الاستبيان بنجاح ✅' : 'تم إضافة الاستبيان بنجاح ✅');
+    } else {
+      showToast('حدث خطأ: ' + data.message, 'error');
+    }
+  } catch(e) { showToast('خطأ في الاتصال', 'error'); }
+  btn.disabled = false;
+  btn.textContent = 'حفظ الاستبيان';
+}
+
+function deleteSurvey(id, title) {
+  document.getElementById('confirmMsg').textContent = `هل أنت متأكد من حذف استبيان "${title}"؟ لا يمكن التراجع عن هذا الإجراء.`;
+  deleteCallback = async () => {
+    try {
+      const res = await fetch(`/api/admin/surveys/${id}`, { method:'DELETE', headers: authHeaders() });
+      const data = await res.json();
+      if (data.success) { loadSurveys(); showToast('تم حذف الاستبيان'); }
+    } catch(e) {}
+    document.getElementById('confirmModal').classList.add('hidden');
+  };
+  document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+function confirmDeleteAction() { if (deleteCallback) deleteCallback(); }
+
+// ===================== RESPONSES =====================
+async function loadResponses() {
+  try {
+    // Load all surveys first for filter
+    if (!allSurveys.length) await loadSurveys();
+
+    // Load responses for all surveys
+    allResponses = [];
+    for (const s of allSurveys) {
+      const res = await fetch(`/api/admin/surveys/${s._id}/responses`, { headers: authHeaders() });
+      const data = await res.json();
+      if (data.success) allResponses.push(...data.data);
+    }
+    allResponses.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+    renderResponsesTable(allResponses);
+  } catch(e) { console.error(e); }
+}
+
+function renderResponsesTable(responses) {
+  const tbody = document.getElementById('responsesTable');
+  document.getElementById('responsesCount').textContent = `إجمالي: ${responses.length} إجابة`;
+  if (!responses.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:2rem;">لا توجد إجابات بعد</td></tr>'; return; }
+  const colorMap = { 'منخفض': 'success', 'متوسط': 'warning', 'مرتفع': 'danger' };
+  tbody.innerHTML = responses.slice(0, 100).map((r, i) => {
+    const pct = r.maxPossibleScore ? Math.round((r.totalScore/r.maxPossibleScore)*100) : '-';
+    const label = r.resultLabel || '';
+    const badgeKey = Object.keys(colorMap).find(k => label.includes(k)) || '';
+    const badge = colorMap[badgeKey] || 'secondary';
+    return `<tr>
+      <td style="color:#94a3b8;">${i+1}</td>
+      <td style="font-size:.85rem;max-width:200px;">${r.surveyTitle||'-'}</td>
+      <td><strong>${r.totalScore}</strong>/${r.maxPossibleScore||'?'}</td>
+      <td>${pct}%</td>
+      <td><span class="badge badge-${badge}">${label||'-'}</span></td>
+      <td style="color:#94a3b8;font-size:.82rem;">${new Date(r.completedAt).toLocaleString('ar-SA')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterResponses() {
+  const surveyId = document.getElementById('responseFilter').value;
+  if (!surveyId) renderResponsesTable(allResponses);
+  else renderResponsesTable(allResponses.filter(r => r.surveyId === surveyId));
+}
+
+// ===================== ADS =====================
+async function loadAds() {
+  try {
+    const res = await fetch('/api/admin/ads', { headers: authHeaders() });
+    const data = await res.json();
+    if (!data.success) return;
+    renderAdsTable(data.data);
+  } catch(e) { console.error(e); }
+}
+
+function renderAdsTable(ads) {
+  const tbody = document.getElementById('adsTable');
+  if (!ads.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:2rem;">لا توجد إعلانات</td></tr>'; return; }
+  const posNames = { homepage_banner:'بانر رئيسي', sidebar:'جانبي', survey_top:'أعلى الاستبيان', between_questions:'بين الأسئلة', results_page:'صفحة النتائج', footer:'الفوتر' };
+  const typeNames = { adsense:'AdSense', custom_html:'HTML', image:'صورة' };
+  tbody.innerHTML = ads.map(ad => `
+    <tr>
+      <td><strong>${ad.name}</strong></td>
+      <td>${posNames[ad.position]||ad.position}</td>
+      <td><span class="badge badge-primary">${typeNames[ad.type]||ad.type}</span></td>
+      <td>${(ad.impressions||0).toLocaleString('ar')}</td>
+      <td>${(ad.clicks||0).toLocaleString('ar')}</td>
+      <td>
+        <label class="toggle">
+          <input type="checkbox" ${ad.isActive?'checked':''} onchange="toggleAd('${ad._id}',this.checked)"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+      <td>
+        <div class="table-actions">
+          <button onclick="editAd('${ad._id}')" class="btn btn-warning btn-sm">✏️</button>
+          <button onclick="deleteAd('${ad._id}','${ad.name}')" class="btn btn-danger btn-sm">🗑️</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function openAdModal(ad=null) {
+  document.getElementById('adEditId').value = '';
+  document.getElementById('adName').value = '';
+  document.getElementById('adPosition').value = 'homepage_banner';
+  document.getElementById('adType').value = 'adsense';
+  document.getElementById('adClient').value = '';
+  document.getElementById('adSlot').value = '';
+  document.getElementById('adContent').value = '';
+  document.getElementById('adActive').checked = true;
+  document.getElementById('adModalTitle').textContent = 'إضافة إعلان جديد';
+  toggleAdFields();
+  document.getElementById('adModal').classList.remove('hidden');
+}
+
+async function editAd(id) {
+  try {
+    const res = await fetch('/api/admin/ads', { headers: authHeaders() });
+    const data = await res.json();
+    const ad = data.data.find(a => a._id === id);
+    if (!ad) return;
+
+    document.getElementById('adEditId').value = ad._id;
+    document.getElementById('adModalTitle').textContent = 'تعديل الإعلان';
+    document.getElementById('adName').value = ad.name;
+    document.getElementById('adPosition').value = ad.position;
+    document.getElementById('adType').value = ad.type;
+    document.getElementById('adClient').value = ad.adsenseClient || '';
+    document.getElementById('adSlot').value = ad.adsenseSlot || '';
+    document.getElementById('adContent').value = ad.content || '';
+    document.getElementById('adActive').checked = ad.isActive;
+    toggleAdFields();
+    document.getElementById('adModal').classList.remove('hidden');
+  } catch(e) {}
+}
+
+function toggleAdFields() {
+  const type = document.getElementById('adType').value;
+  document.getElementById('adsenseFields').classList.toggle('hidden', type !== 'adsense');
+  document.getElementById('customHtmlFields').classList.toggle('hidden', type !== 'custom_html');
+  document.getElementById('imageAdFields').classList.toggle('hidden', type !== 'image');
+}
+
+function closeAdModal() { document.getElementById('adModal').classList.add('hidden'); }
+
+async function saveAd() {
+  const editId = document.getElementById('adEditId').value;
+  const type = document.getElementById('adType').value;
+  const payload = {
+    name: document.getElementById('adName').value.trim(),
+    position: document.getElementById('adPosition').value,
+    type,
+    isActive: document.getElementById('adActive').checked
+  };
+  if (type === 'adsense') {
+    payload.adsenseClient = document.getElementById('adClient').value.trim();
+    payload.adsenseSlot = document.getElementById('adSlot').value.trim();
+  } else if (type === 'custom_html') {
+    payload.content = document.getElementById('adContent').value.trim();
+  } else if (type === 'image') {
+    payload.imageUrl = document.getElementById('adImageUrl').value.trim();
+    payload.linkUrl = document.getElementById('adLinkUrl').value.trim();
+    payload.content = `<a href="${payload.linkUrl}" target="_blank"><img src="${payload.imageUrl}" style="max-width:100%;"/></a>`;
+  }
+
+  try {
+    const url = editId ? `/api/admin/ads/${editId}` : '/api/admin/ads';
+    const method = editId ? 'PUT' : 'POST';
+    const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.success) { closeAdModal(); loadAds(); showToast('تم حفظ الإعلان ✅'); }
+    else showToast('حدث خطأ: ' + data.message, 'error');
+  } catch(e) { showToast('خطأ في الاتصال', 'error'); }
+}
+
+async function toggleAd(id, isActive) {
+  try {
+    await fetch(`/api/admin/ads/${id}`, { method:'PUT', headers: authHeaders(), body: JSON.stringify({ isActive }) });
+    showToast(isActive ? 'تم تفعيل الإعلان' : 'تم إيقاف الإعلان');
+  } catch(e) {}
+}
+
+function deleteAd(id, name) {
+  document.getElementById('confirmMsg').textContent = `هل أنت متأكد من حذف إعلان "${name}"؟`;
+  deleteCallback = async () => {
+    try {
+      await fetch(`/api/admin/ads/${id}`, { method:'DELETE', headers: authHeaders() });
+      loadAds();
+      showToast('تم حذف الإعلان');
+    } catch(e) {}
+    document.getElementById('confirmModal').classList.add('hidden');
+  };
+  document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+// ===================== TOAST =====================
+function showToast(msg, type='success') {
+  const toast = document.createElement('div');
+  toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:${type==='error'?'#ef4444':'#10b981'};color:white;padding:.85rem 1.75rem;border-radius:50px;font-weight:600;z-index:9999;box-shadow:0 8px 20px rgba(0,0,0,.2);font-family:Tajawal,sans-serif;font-size:.95rem;`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// Init
+loadDashboard();
+</script>
+</body>
+</html>

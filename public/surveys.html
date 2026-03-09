@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>جميع اختبارات ADHD | منصة ADHD العربية</title>
+  <meta name="description" content="تصفح جميع اختبارات اضطراب نقص الانتباه وفرط النشاط ADHD المتاحة باللغة العربية"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="container">
+    <a href="/" class="navbar-brand"><div class="logo-icon">🧠</div><span>منصة ADHD</span></a>
+    <div class="navbar-nav" id="navMenu">
+      <a href="/">الرئيسية</a>
+      <a href="/surveys.html" class="active">الاستبيانات</a>
+      <a href="/about.html">عن ADHD</a>
+    </div>
+    <div class="navbar-actions">
+      <button class="hamburger" onclick="document.getElementById('navMenu').classList.toggle('open')">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Ad Banner -->
+<div class="container" style="margin-top:1rem;">
+  <div class="ad-zone banner" id="ad-banner"><div class="ad-label">إعلان</div><span>مساحة إعلانية</span></div>
+</div>
+
+<!-- Page Header -->
+<section style="background:linear-gradient(135deg,#4f46e5,#3730a3);padding:3rem 0;margin-bottom:2rem;">
+  <div class="container" style="text-align:center;color:white;">
+    <h1 style="color:white;margin-bottom:.75rem;">اختبارات ADHD المتاحة</h1>
+    <p style="color:rgba(255,255,255,.8);">اختر الاختبار المناسب لك وابدأ التقييم الآن مجاناً</p>
+  </div>
+</section>
+
+<div class="container" style="padding-bottom:4rem;">
+  <div style="display:grid;grid-template-columns:1fr 280px;gap:2rem;align-items:start;">
+
+    <!-- Surveys List -->
+    <div>
+      <div style="margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+        <p style="color:#64748b;" id="surveysCount">جاري التحميل...</p>
+      </div>
+      <div id="surveysContainer">
+        <div style="text-align:center;padding:3rem;color:#94a3b8;">
+          <div style="font-size:2rem;margin-bottom:1rem;">⏳</div>
+          <p>جاري تحميل الاختبارات...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div style="position:sticky;top:100px;">
+      <!-- Sidebar Ad -->
+      <div class="ad-zone sidebar-ad" id="ad-sidebar" style="margin-bottom:1.5rem;">
+        <div class="ad-label">إعلان</div>
+        <span>مساحة إعلانية 300×250</span>
+      </div>
+
+      <!-- Info Box -->
+      <div style="background:white;border-radius:12px;padding:1.5rem;border:1px solid #e2e8f0;box-shadow:0 4px 6px rgba(0,0,0,.05);margin-bottom:1.5rem;">
+        <h3 style="font-size:1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;">💡 نصيحة مهمة</h3>
+        <p style="font-size:.85rem;color:#64748b;line-height:1.8;">أجب على الأسئلة بصدق بناءً على تجربتك خلال الأشهر الستة الماضية للحصول على أدق النتائج.</p>
+      </div>
+
+      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:1.5rem;">
+        <h3 style="font-size:.95rem;color:#92400e;margin-bottom:.75rem;">⚠️ إخلاء مسؤولية</h3>
+        <p style="font-size:.82rem;color:#78350f;line-height:1.8;">هذه الاختبارات أدوات فحص ذاتي ولا تُغني عن الاستشارة الطبية المتخصصة.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none;padding-top:0;">
+      <p>© 2024 منصة ADHD - جميع الحقوق محفوظة</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="/" style="color:rgba(255,255,255,.6);font-size:.9rem;">الرئيسية</a>
+        <a href="/about.html" style="color:rgba(255,255,255,.6);font-size:.9rem;">عن ADHD</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+async function loadSurveys() {
+  try {
+    const res = await fetch('/api/surveys');
+    const data = await res.json();
+    const container = document.getElementById('surveysContainer');
+
+    if (!data.success || data.data.length === 0) {
+      container.innerHTML = '<p style="text-align:center;padding:3rem;color:#94a3b8;">لا توجد اختبارات متاحة حالياً</p>';
+      return;
+    }
+
+    document.getElementById('surveysCount').textContent = `${data.data.length} اختبار متاح`;
+    container.innerHTML = '';
+
+    data.data.forEach((survey, i) => {
+      const colors = ['#4f46e5','#06b6d4','#10b981','#f59e0b','#ef4444'];
+      const color = colors[i % colors.length];
+      container.innerHTML += `
+        <div class="survey-card" style="margin-bottom:1.5rem;">
+          <div class="survey-card-header" style="background:linear-gradient(135deg,${color},${color}cc);">
+            <span class="survey-card-badge">اختبار ${i+1}</span>
+            <span class="survey-card-icon">${survey.icon || '🧠'}</span>
+            <h3>${survey.title}</h3>
+          </div>
+          <div class="survey-card-body">
+            <p>${survey.description}</p>
+            <div class="survey-meta">
+              <span>⏱️ ${survey.estimatedMinutes} دقائق</span>
+              <span>❓ ${survey.questions ? survey.questions.length : '?'} سؤال</span>
+              <span>👥 ${(survey.totalResponses || 0).toLocaleString('ar')} مشارك</span>
+            </div>
+          </div>
+          <div class="survey-card-footer" style="display:flex;gap:.75rem;">
+            <a href="/survey.html?slug=${survey.slug}" class="btn btn-primary" style="flex:1;justify-content:center;">
+              ابدأ الاختبار ←
+            </a>
+          </div>
+        </div>`;
+    });
+
+    // Load sidebar ad
+    loadAd('sidebar', 'ad-sidebar');
+    loadAd('homepage_banner', 'ad-banner');
+  } catch(e) {
+    document.getElementById('surveysContainer').innerHTML = '<p style="text-align:center;padding:2rem;color:#ef4444;">تعذر تحميل الاختبارات. تأكد من تشغيل الخادم.</p>';
+  }
+}
+
+async function loadAd(position, elId) {
+  try {
+    const res = await fetch(`/api/ads/${position}`);
+    const data = await res.json();
+    if (data.success && data.data.length > 0) {
+      const ad = data.data[0];
+      const el = document.getElementById(elId);
+      if (el && ad.content) el.innerHTML = ad.content;
+    }
+  } catch(e) {}
+}
+
+loadSurveys();
+</script>
+</body>
+</html>

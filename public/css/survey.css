@@ -1,0 +1,124 @@
+/* ========== SURVEY PAGE ========== */
+.survey-page { min-height: 100vh; background: var(--light-gray); }
+
+.survey-header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  padding: 2rem 0; color: white; margin-bottom: 2rem;
+}
+.survey-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+.survey-header h1 { color: white; font-size: 1.5rem; margin: 0; display: flex; align-items: center; gap: .75rem; }
+.survey-header-meta { display: flex; align-items: center; gap: 1.5rem; }
+.survey-header-meta span { display: flex; align-items: center; gap: .4rem; color: rgba(255,255,255,.85); font-size: .9rem; }
+
+/* Progress */
+.progress-section { margin-bottom: 1.5rem; }
+.progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: .75rem; }
+.progress-label { font-size: .9rem; color: var(--gray); font-weight: 500; }
+.progress-fraction { font-size: .9rem; font-weight: 700; color: var(--primary); }
+.progress-bar-wrap { background: var(--border); border-radius: 50px; height: 10px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 50px; transition: width .5s ease; }
+
+/* Question Card */
+.question-card {
+  background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  padding: 2.5rem; margin-bottom: 1.5rem; border: 1px solid var(--border);
+  animation: fadeSlide .4s ease;
+}
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.question-number { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(79,70,229,.1); color: var(--primary); border-radius: 50%; font-weight: 700; font-size: .95rem; margin-bottom: 1.25rem; }
+.question-text { font-size: 1.15rem; font-weight: 600; color: var(--dark); margin-bottom: 2rem; line-height: 1.6; }
+
+/* Answer Options */
+.answer-options { display: flex; flex-direction: column; gap: .75rem; }
+.answer-option {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.25rem; border-radius: var(--radius-sm);
+  border: 2px solid var(--border); cursor: pointer;
+  transition: var(--transition); background: white;
+}
+.answer-option:hover { border-color: var(--primary-light); background: rgba(79,70,229,.03); }
+.answer-option.selected { border-color: var(--primary); background: rgba(79,70,229,.07); }
+.answer-option input[type="radio"] { display: none; }
+.radio-custom {
+  width: 22px; height: 22px; min-width: 22px; border-radius: 50%;
+  border: 2px solid var(--border); display: flex; align-items: center; justify-content: center;
+  transition: var(--transition); background: white;
+}
+.answer-option.selected .radio-custom { border-color: var(--primary); background: var(--primary); }
+.radio-custom::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: white; opacity: 0; transition: var(--transition); }
+.answer-option.selected .radio-custom::after { opacity: 1; }
+.answer-text { font-size: .95rem; font-weight: 500; color: var(--dark2); transition: var(--transition); }
+.answer-option.selected .answer-text { color: var(--primary); font-weight: 600; }
+
+/* Score indicators */
+.score-labels { display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: .8rem; color: var(--gray); }
+
+/* Navigation */
+.survey-navigation { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.nav-dots { display: flex; gap: .5rem; flex-wrap: wrap; max-width: 60%; }
+.nav-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--border); cursor: pointer; transition: var(--transition); border: none; }
+.nav-dot.answered { background: var(--success); }
+.nav-dot.current { background: var(--primary); transform: scale(1.3); }
+
+/* Submit Section */
+.submit-section { text-align: center; padding: 2rem; }
+.submit-section p { margin-bottom: 1.5rem; }
+
+/* ========== RESULTS PAGE ========== */
+.results-page { padding: 3rem 0; }
+.result-card {
+  background: white; border-radius: var(--radius); box-shadow: var(--shadow-lg);
+  overflow: hidden; margin-bottom: 2rem;
+}
+.result-header { padding: 3rem 2.5rem; text-align: center; color: white; }
+.result-header .result-icon { font-size: 4rem; margin-bottom: 1rem; display: block; }
+.result-header h2 { color: white; font-size: 1.8rem; margin-bottom: .75rem; }
+.result-header .result-score { font-size: 3.5rem; font-weight: 800; color: white; display: block; line-height: 1; }
+.result-header .result-max { font-size: 1rem; color: rgba(255,255,255,.7); }
+
+.result-body { padding: 2.5rem; }
+.result-label-badge { display: inline-flex; align-items: center; gap: .5rem; padding: .75rem 1.5rem; border-radius: 50px; font-weight: 700; font-size: 1.05rem; margin-bottom: 1.5rem; }
+.result-description { font-size: 1.05rem; color: var(--dark2); line-height: 1.8; margin-bottom: 1.5rem; }
+.medical-disclaimer { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.3); border-radius: var(--radius-sm); padding: 1.25rem 1.5rem; font-size: .9rem; color: var(--dark2); display: flex; gap: .75rem; align-items: flex-start; }
+.medical-disclaimer .disclaimer-icon { font-size: 1.3rem; margin-top: .1rem; }
+
+/* Chart */
+.chart-section { background: white; border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); margin-bottom: 2rem; }
+.chart-title { font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 1.5rem; display: flex; align-items: center; gap: .5rem; }
+.gauge-container { position: relative; max-width: 280px; margin: 0 auto; }
+.gauge-value { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); text-align: center; }
+.gauge-value .percent { font-size: 2rem; font-weight: 800; color: var(--dark); display: block; }
+.gauge-value .label { font-size: .85rem; color: var(--gray); }
+
+.score-breakdown { margin-top: 1.5rem; }
+.breakdown-item { margin-bottom: .75rem; }
+.breakdown-header { display: flex; justify-content: space-between; margin-bottom: .4rem; font-size: .9rem; }
+.breakdown-bar { background: var(--light-gray); border-radius: 50px; height: 8px; overflow: hidden; }
+.breakdown-fill { height: 100%; border-radius: 50px; transition: width 1s ease; }
+
+/* Result Answers */
+.answers-review { background: white; border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow); margin-bottom: 2rem; }
+.answers-review h3 { margin-bottom: 1.5rem; display: flex; align-items: center; gap: .5rem; }
+.answer-review-item { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: .75rem; }
+.answer-review-item .q-num { min-width: 32px; height: 32px; border-radius: 50%; background: rgba(79,70,229,.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; }
+.answer-review-item .q-content { flex: 1; }
+.answer-review-item .q-text { font-size: .9rem; color: var(--dark2); margin-bottom: .4rem; font-weight: 500; }
+.answer-review-item .q-answer { font-size: .85rem; color: var(--primary); font-weight: 600; }
+.answer-review-item .q-score { font-size: .8rem; padding: .2rem .6rem; border-radius: 50px; background: rgba(79,70,229,.1); color: var(--primary); font-weight: 600; white-space: nowrap; }
+
+/* Result Actions */
+.result-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
+
+/* ========== AD SIDEBAR LAYOUT ========== */
+.survey-layout { display: grid; grid-template-columns: 1fr 280px; gap: 2rem; align-items: start; }
+.survey-sidebar { position: sticky; top: 100px; }
+
+@media (max-width: 900px) {
+  .survey-layout { grid-template-columns: 1fr; }
+  .survey-sidebar { position: static; }
+}
+@media (max-width: 600px) {
+  .question-card { padding: 1.5rem; }
+  .result-header { padding: 2rem 1.5rem; }
+  .result-body { padding: 1.5rem; }
+}
