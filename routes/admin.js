@@ -2,20 +2,23 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const db = require('../lib/db');
+const Survey = require('../models/Survey');
+const Response = require('../models/Response');
+const Admin = require('../models/Admin');
+const Ad = require('../models/Ad');
 const { protect } = require('../middleware/auth');
 
 // POST admin login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const admin = await db.admins.findOneAsync({ username });
+    const admin = await Admin.findOne({ username });
     if (!admin) return res.status(401).json({ success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
 
     const match = await bcrypt.compare(password, admin.password);
     if (!match) return res.status(401).json({ success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
 
-    await db.admins.updateAsync({ _id: admin._id }, { $set: { lastLogin: new Date() } });
+    await Admin.findByIdAndUpdate(admin._id, { lastLogin: new Date() });
 
     const token = jwt.sign(
       { id: admin._id, username: admin.username },
@@ -31,16 +34,14 @@ router.post('/login', async (req, res) => {
 // GET stats
 router.get('/stats', protect, async (req, res) => {
   try {
-    const surveys = await db.surveys.findAsync({ isActive: true });
-    const allResponses = await db.responses.findAsync({});
+    const surveys = await Survey.find({ isActive: true });
+    const allResponses = await Response.find({});
     const totalResponses = allResponses.length;
 
-    // Last 10 responses
     const recentResponses = allResponses
       .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
       .slice(0, 10);
 
-    // Daily responses last 7 days
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -74,8 +75,7 @@ router.get('/stats', protect, async (req, res) => {
 // GET all surveys (admin)
 router.get('/surveys', protect, async (req, res) => {
   try {
-    const surveys = await db.surveys.findAsync({});
-    surveys.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const surveys = await Survey.find({}).sort({ createdAt: -1 });
     res.json({ success: true, data: surveys });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -85,7 +85,7 @@ router.get('/surveys', protect, async (req, res) => {
 // GET single survey (admin)
 router.get('/surveys/:id', protect, async (req, res) => {
   try {
-    const survey = await db.surveys.findOneAsync({ _id: req.params.id });
+    const survey = await Survey.findById(req.params.id);
     if (!survey) return res.status(404).json({ success: false, message: 'الاستبيان غير موجود' });
     res.json({ success: true, data: survey });
   } catch (err) {
@@ -99,14 +99,13 @@ router.post('/surveys', protect, async (req, res) => {
     const { title, description, category, icon, estimatedMinutes, questions, scoringRules, isActive } = req.body;
     const slug = encodeURIComponent(title.trim().toLowerCase().replace(/\s+/g, '-').substring(0, 60)) + '-' + Date.now();
 
-    // Add _id to each question
     const processedQuestions = (questions || []).map((q, i) => ({
-      ...q,
-      _id: `q_${Date.now()}_${i}`,
-      order: q.order || i + 1
+      text: q.text,
+      order: q.order || i + 1,
+      answerOptions: q.answerOptions || []
     }));
 
-    const doc = {
+    const survey = await Survey.create({
       title, slug, description,
       category: category || 'ADHD',
       icon: icon || '🧠',
@@ -115,11 +114,8 @@ router.post('/surveys', protect, async (req, res) => {
       questions: processedQuestions,
       scoringRules: scoringRules || [],
       totalResponses: 0,
-      averageScore: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    const survey = await db.surveys.insertAsync(doc);
+      averageScore: 0
+    });
     res.status(201).json({ success: true, data: survey });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -132,16 +128,16 @@ router.put('/surveys/:id', protect, async (req, res) => {
     const { title, description, category, icon, estimatedMinutes, questions, scoringRules, isActive } = req.body;
 
     const processedQuestions = (questions || []).map((q, i) => ({
-      ...q,
-      _id: q._id || `q_${Date.now()}_${i}`,
-      order: q.order || i + 1
+      text: q.text,
+      order: q.order || i + 1,
+      answerOptions: q.answerOptions || []
     }));
 
-    await db.surveys.updateAsync(
-      { _id: req.params.id },
-      { $set: { title, description, category, icon, estimatedMinutes, questions: processedQuestions, scoringRules, isActive, updatedAt: new Date() } }
+    const updated = await Survey.findByIdAndUpdate(
+      req.params.id,
+      { $set: { title, description, category, icon, estimatedMinutes, questions: processedQuestions, scoringRules, isActive, updatedAt: new Date() } },
+      { new: true }
     );
-    const updated = await db.surveys.findOneAsync({ _id: req.params.id });
     if (!updated) return res.status(404).json({ success: false, message: 'الاستبيان غير موجود' });
     res.json({ success: true, data: updated });
   } catch (err) {
@@ -152,8 +148,8 @@ router.put('/surveys/:id', protect, async (req, res) => {
 // DELETE survey
 router.delete('/surveys/:id', protect, async (req, res) => {
   try {
-    const n = await db.surveys.removeAsync({ _id: req.params.id }, {});
-    if (!n) return res.status(404).json({ success: false, message: 'الاستبيان غير موجود' });
+    const deleted = await Survey.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ success: false, message: 'الاستبيان غير موجود' });
     res.json({ success: true, message: 'تم حذف الاستبيان بنجاح' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -163,9 +159,8 @@ router.delete('/surveys/:id', protect, async (req, res) => {
 // GET survey responses
 router.get('/surveys/:id/responses', protect, async (req, res) => {
   try {
-    const responses = await db.responses.findAsync({ surveyId: req.params.id });
-    responses.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
-    res.json({ success: true, data: responses.slice(0, 100) });
+    const responses = await Response.find({ surveyId: req.params.id }).sort({ completedAt: -1 }).limit(100);
+    res.json({ success: true, data: responses });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -174,8 +169,7 @@ router.get('/surveys/:id/responses', protect, async (req, res) => {
 // --- ADS ---
 router.get('/ads', protect, async (req, res) => {
   try {
-    const ads = await db.ads.findAsync({});
-    ads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const ads = await Ad.find({}).sort({ createdAt: -1 });
     res.json({ success: true, data: ads });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -184,8 +178,7 @@ router.get('/ads', protect, async (req, res) => {
 
 router.post('/ads', protect, async (req, res) => {
   try {
-    const doc = { ...req.body, impressions: 0, clicks: 0, createdAt: new Date() };
-    const ad = await db.ads.insertAsync(doc);
+    const ad = await Ad.create({ ...req.body, impressions: 0, clicks: 0 });
     res.status(201).json({ success: true, data: ad });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -194,8 +187,7 @@ router.post('/ads', protect, async (req, res) => {
 
 router.put('/ads/:id', protect, async (req, res) => {
   try {
-    await db.ads.updateAsync({ _id: req.params.id }, { $set: req.body });
-    const ad = await db.ads.findOneAsync({ _id: req.params.id });
+    const ad = await Ad.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
     if (!ad) return res.status(404).json({ success: false, message: 'الإعلان غير موجود' });
     res.json({ success: true, data: ad });
   } catch (err) {
@@ -205,7 +197,7 @@ router.put('/ads/:id', protect, async (req, res) => {
 
 router.delete('/ads/:id', protect, async (req, res) => {
   try {
-    await db.ads.removeAsync({ _id: req.params.id }, {});
+    await Ad.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'تم حذف الإعلان' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

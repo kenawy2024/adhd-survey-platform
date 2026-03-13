@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../lib/db');
+const Survey = require('../models/Survey');
+const Response = require('../models/Response');
 
 // GET all active surveys
 router.get('/', async (req, res) => {
   try {
-    const surveys = await db.surveys.findAsync({ isActive: true });
-    surveys.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    const surveys = await Survey.find({ isActive: true }).sort({ createdAt: 1 });
     res.json({ success: true, data: surveys });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 // GET single survey by slug
 router.get('/:slug', async (req, res) => {
   try {
-    const survey = await db.surveys.findOneAsync({ slug: req.params.slug, isActive: true });
+    const survey = await Survey.findOne({ slug: req.params.slug, isActive: true });
     if (!survey) return res.status(404).json({ success: false, message: 'الاستبيان غير موجود' });
     res.json({ success: true, data: survey });
   } catch (err) {
@@ -27,7 +27,7 @@ router.get('/:slug', async (req, res) => {
 // POST submit survey response
 router.post('/:slug/submit', async (req, res) => {
   try {
-    const survey = await db.surveys.findOneAsync({ slug: req.params.slug, isActive: true });
+    const survey = await Survey.findOne({ slug: req.params.slug, isActive: true });
     if (!survey) return res.status(404).json({ success: false, message: 'الاستبيان غير موجود' });
 
     const { answers, sessionId } = req.body;
@@ -43,7 +43,7 @@ router.post('/:slug/submit', async (req, res) => {
       const maxOption = Math.max(...question.answerOptions.map(o => o.score));
       maxPossibleScore += maxOption;
 
-      const answer = answers.find(a => a.questionId === question._id);
+      const answer = answers.find(a => a.questionId === question._id.toString());
       if (answer) {
         const option = question.answerOptions.find(o => o.text === answer.selectedOption);
         if (option) {
@@ -72,7 +72,7 @@ router.post('/:slug/submit', async (req, res) => {
       }
     }
 
-    const responseDoc = {
+    const saved = await Response.create({
       surveyId: survey._id,
       surveyTitle: survey.title,
       answers: processedAnswers,
@@ -84,15 +84,14 @@ router.post('/:slug/submit', async (req, res) => {
       sessionId: sessionId || '',
       userAgent: req.headers['user-agent'] || '',
       completedAt: new Date()
-    };
-
-    const saved = await db.responses.insertAsync(responseDoc);
+    });
 
     // Update survey stats
-    const allResponses = await db.responses.findAsync({ surveyId: survey._id });
+    const allResponses = await Response.find({ surveyId: survey._id });
     const avgScore = allResponses.reduce((s, r) => s + r.totalScore, 0) / allResponses.length;
-    await db.surveys.updateAsync({ _id: survey._id }, {
-      $set: { totalResponses: allResponses.length, averageScore: Math.round(avgScore * 10) / 10 }
+    await Survey.findByIdAndUpdate(survey._id, {
+      totalResponses: allResponses.length,
+      averageScore: Math.round(avgScore * 10) / 10
     });
 
     res.json({

@@ -5,11 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-const fs = require('fs');
-
-// Ensure data directory exists
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -43,14 +39,21 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log('');
-  console.log('🧠 ============================================');
-  console.log(`🚀  منصة ADHD تعمل على http://localhost:${PORT}`);
-  console.log(`🔐  لوحة التحكم: http://localhost:${PORT}/admin/login.html`);
-  console.log('👤  بيانات الدخول: admin / admin123');
-  console.log('💾  قاعدة البيانات: مدمجة (NeDB) - جاهزة تلقائياً');
-  console.log('🧠 ============================================');
-  console.log('');
-  console.log('⚡ إذا كانت أول تشغيل، نفّذ: npm run seed');
-});
+
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('✅ متصل بقاعدة البيانات MongoDB');
+    app.listen(PORT, () => {
+      console.log('');
+      console.log('🧠 ============================================');
+      console.log(`🚀  منصة ADHD تعمل على http://localhost:${PORT}`);
+      console.log(`🔐  لوحة التحكم: http://localhost:${PORT}/admin/login.html`);
+      console.log('👤  بيانات الدخول: admin / admin123');
+      console.log('🧠 ============================================');
+      console.log('');
+    });
+  })
+  .catch(err => {
+    console.error('❌ فشل الاتصال بقاعدة البيانات:', err.message);
+    process.exit(1);
+  });
